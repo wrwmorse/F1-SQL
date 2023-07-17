@@ -1,0 +1,27 @@
+SELECT 
+ra.date,
+seas.year AS 'Season',
+d.forename ||' '||  d.surname AS 'Name',
+c.name as 'Team',
+R.points AS 'Race_points',
+ra.name AS 'Race_Name',
+sp.points AS 'Sprint_Points',
+CASE 
+  WHEN r.raceId IN (SELECT sp.raceId FROM sprint_results) THEN 'Sprint_race'
+  ELSE 'Regular Race'
+END AS 'Type_of_race',
+SUM (r.points + sp.points) AS 'Total_Points'
+FROM results r
+JOIN races ra
+on ra.raceid = r.raceid
+LEFT JOIN sprint_results sp
+on sp.raceid = r.raceId AND sp.driverid = r.driverId
+JOIN drivers_no_image d
+on d.driverId = r.driverId
+JOIN seasons seas
+on seas.year = ra.year
+JOIN constructors c
+on c.constructorId = r.constructorid
+WHERE seas.year = '2022'
+GROUP BY 1,2,3,4,5,6,7,8
+ORDER BY 1, 5 DESC ,2,3,4,6,7,8
